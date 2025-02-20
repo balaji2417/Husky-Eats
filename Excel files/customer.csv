@@ -1,0 +1,11 @@
+﻿username,user_password,user_type,Reference_Id
+john_doe,password123,Student,1001
+jane_smith,password456,Faculty,2001
+mike_johnson,password789,Student,1002
+emily_brown,password101,Faculty,2002
+william_clark,password102,Student,1007
+Kathleen_Durant,password103,Faculty,2006
+david_wilson,password104,Student,1003
+robert_taylor,password105,Faculty,2003
+liam_scott,password106,Student,1014
+Daniel_clarison,password107,Faculty,2010

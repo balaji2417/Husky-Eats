@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shopping Cart</title>
+  <link rel="icon" href="logo.jpg" type="image/jpg">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="icon" href="logo.jpg" type="image/jpg">
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  <style>
+    /* Cart Item Styling */
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+    }
+    .cart-item .item-name {
+      font-weight: bold;
+    }
+    .cart-item .item-price {
+      color: green;
+    }
+    .cart-item .item-quantity {
+      width: 40px;
+      text-align: center;
+    }
+    .remove-btn {
+      background-color: red;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    /* Image Styling */
+    img {
+      border-radius: 50%; /* Circular effect */
+      max-width: 100px; /* Adjust image size */
+      max-height: 100px;
+    }
+
+    /* Top Bar Styling */
+    #top-bar {
+      background-color: black;
+      font-family: 'Inter', sans-serif;
+      padding: 15px 0;
+      color: white;
+    }
+
+    /* Title Styling */
+    .Name {
+      font-size: 36px; 
+      font-weight: 700; 
+      letter-spacing: 3px;
+      text-align: center;
+    }
+
+    /* Background Styling */
+    body {
+      height: 100vh;
+      background-color: floralwhite;
+      background-size: cover;
+    }
+
+    .navbar {
+      background-color: #fff7e6;
+      margin-top: 25px; /* Space below the tagline */
+      padding: 10px 0;
+    }
+
+    .navbar-nav {
+      gap: 20px; /* Spacing between menu items */
+    }
+
+    .nav-link {
+      color: #333;
+      font-weight: bold;
+      padding: 10px 20px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    /* Quantity Button Styling */
+    .quantity-selector {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+
+    .quantity-btn {
+      background-color: #ffa500;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 5px 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .quantity-btn:hover {
+      background-color: #ff8c00;
+    }
+
+    .quantity {
+      font-size: 16px;
+      font-weight: bold;
+      margin: 0 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <div class="container-fluid" id="top-bar">
+    <div class="row">
+      <div class="col-sm text-center">
+        <img src="{{ url_for('static', filename='husky.png') }}" alt="Husky Logo">
+      </div>
+      <div class="col-sm text-center">
+        <h1 class="Name">Husky Eats</h1>
+      </div>
+      <div class="col-sm">
+        <div class="dropdown show">
+          <a style="background-color:black; color:white; margin-top:5px; margin-left:200px;" class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            {{ message }}
+          </a>
+
+          <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+            <a class="dropdown-item" href="#">Cart</a>
+            <a class="dropdown-item" href="{{url_for('home_display')}}">Home</a>
+            <a class="dropdown-item" href="{{ url_for('logout') }}">Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shopping Cart Table -->
+  <div class="container mt-5">
+    <h2 class="text-center">Shopping Cart</h2>
+
+    <table class="table table-bordered" id="cartTable">
+      <thead class="thead-dark">
+        <tr>
+          <th>Store Name</th>
+          <th>Items</th>
+          <th>Price</th>
+          <th>Quantity</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+	{% if zipped_data|length > 0 %}
+    {% for store, item, price, qty in zipped_data %}
+        <tr class="bb">
+            <td>{{ store }}</td>
+            <td>{{ item }}</td>
+            <td class="item-price">{{ price }}</td>
+            <td>
+                <!-- Form for updating quantity -->
+                <form action="{{ url_for('update_cart') }}" method="POST" class="d-inline">
+                    <input type="hidden" name="username" value="{{ username }}">
+                    <input type="hidden" name="item" value="{{ item }}">
+                    <input type="hidden" name="store_id" value="{{ store }}">
+
+                    <!-- Decrease quantity button -->
+                    <button type="submit" name="action" value="decrease" class="quantity-btn">-</button>
+
+                    <!-- Display quantity -->
+                    <span class="quantity">{{ qty }}</span>
+
+                    <!-- Add quantity button -->
+                    <button type="submit" name="action" value="add" class="quantity-btn">+</button>
+                </form>
+            </td>
+            <td>
+                <!-- Form for removing item from cart -->
+                <form action="{{ url_for('update_cart') }}" method="POST" class="d-inline">
+                    <input type="hidden" name="username" value="{{ username }}">
+                    <input type="hidden" name="item" value="{{ item }}">
+                    <input type="hidden" name="store_id" value="{{ store }}">
+                    <button type="submit" name="action" value="remove" class="btn btn-danger btn-sm">Delete</button>
+                </form>
+            </td>
+        </tr>
+    {% endfor %}
+{% else %}
+    <h5 style="color:black;">No Items in the cart</h5>
+{% endif %}
+
+      </tbody>
+    </table>
+
+    <!-- Total Price -->
+    <div class="text-right">
+      <h4>Total Price: ${{ total|round(2) }}</h4>
+    </div>
+
+    <!-- Delivery Location Input -->
+    <div class="form-group">
+      <label for="deliveryLocation">Delivery Location:</label>
+   <select class="form-select" aria-label="Default select example" id = "deliveryLocation">
+  <option selected>Select The Building</option>
+  {% for build in building %}
+  <option value="{{build}}">{{build}}</option>
+    {% endfor %}
+</select>
+    </div>
+
+    <!-- Place Order Button -->
+    <div class="text-center mt-4">
+      <button class="btn btn-success" id="placeOrderBtn">Place Order</button>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('placeOrderBtn').addEventListener('click', function() {
+      const deliveryLocation = document.getElementById('deliveryLocation').value;
+      const totalPrice = '{{ total|round(2) }}';
+
+      if (!deliveryLocation) {
+        alert('Please enter a delivery location');
+        return;
+      }
+
+      // Sending the data via AJAX or form submission
+      const orderData = {
+        totalPrice: totalPrice,
+        deliveryLocation: deliveryLocation,
+      };
+
+      // Example: Send data to the backend (e.g., via a POST request)
+      fetch('{{ url_for("place_order") }}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderData),
+      })
+      .then(response => {
+  if (!response.ok) {
+    // Handle error response (e.g., 400, 500, etc.)
+ return response.json().then(errorData => {
+      throw new Error(errorData.error);
+    });
+  }
+  return response.json();
+})
+      .then(data => {
+        alert('Order placed successfully');
+        window.location.href = '/orders';
+      })
+      .catch(error => {
+      
+		 alert(`Error: ${error.message}`);
+      });
+    });
+  </script>
+
+</body>
+</html>
